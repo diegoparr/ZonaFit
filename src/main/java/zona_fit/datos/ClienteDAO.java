@@ -131,6 +131,24 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public boolean eliminarCliente(Cliente cliente) {
+        PreparedStatement ps;
+        Connection con = getConnection();
+        String sql = "DELETE FROM cliente WHERE id = ?";
+        try{
+            ps = con.prepareStatement(sql);
+            ps.setInt(1,cliente.getId());
+            ps.execute();
+            return true;
+        }catch (Exception e){
+            System.out.println("Error al borrar cliente con id: " + cliente.getId() + ": " + e);
+        }finally {
+            try{
+                con.close();
+            }catch (Exception e){
+                System.out.println("Error al cerrar la base de datos: " + e);
+            }
+        }
+
         return false;
     }
 
@@ -156,16 +174,26 @@ public class ClienteDAO implements IClienteDAO {
             //System.out.println("No se agrego el cliente: " + nuevoCliente);
 
         // Modificar cliente
-        var clienteActualizado = new Cliente(6,"Carlos Daniel","Ortiz",300);
-        var modificado = clienteDAO.modificarCliente(clienteActualizado);
-        if(modificado)
-            System.out.println("Cliente modificado: " + clienteActualizado);
+        // clienteActualizado = new Cliente(6,"Carlos Daniel","Ortiz",300);
+        //var modificado = clienteDAO.modificarCliente(clienteActualizado);
+        //if(modificado)
+          //  System.out.println("Cliente modificado: " + clienteActualizado);
+        // else
+           // System.out.println("No se modifico cliente: " + clienteActualizado);
+
+        // Borrar Cliente
+        var clienteABorrar = new Cliente(7);
+        var borrado = clienteDAO.eliminarCliente(clienteABorrar);
+        if(borrado)
+            System.out.println("Cliente eliminado: " + clienteABorrar);
         else
-            System.out.println("No se modifico cliente: " + clienteActualizado);
+            System.out.println("No se elimino el cliente: " + clienteABorrar);
+
 
         // Listar clientes
-         System.out.println("*** Listar Clientes ***");
+        System.out.println("*** Listar Clientes ***");
         var clientes = clienteDAO.listarClientes();
-         clientes.forEach(System.out::println);
+        clientes.forEach(System.out::println);
+
     }
 }
