@@ -23,6 +23,7 @@ public class Cliente {
 
     public Cliente(int id, String nombre, String apellido, int membresia) {
         this(nombre,apellido,membresia);
+        this.id = id;
     }
 
     public int getId() {

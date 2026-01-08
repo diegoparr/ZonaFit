@@ -49,6 +49,30 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public boolean buscarClientePorId(Cliente cliente) {
+        PreparedStatement ps;
+        ResultSet rs;
+        var con = getConnection();
+        var sql = "SELECT * FROM cliente WHERE id = ?";
+        try{
+            ps = con.prepareStatement(sql);
+            ps.setInt(1,cliente.getId());
+            rs = ps.executeQuery();
+            if(rs.next()){
+                cliente.setNombre(rs.getString("nombre"));
+                cliente.setApellido(rs.getString("apellido"));
+                cliente.setMembresia(rs.getInt("membresia"));
+                return true;
+            }
+
+        }catch (Exception e){
+            System.out.println("Error al recuperar cliente por id: " + e);
+        }finally {
+            try{
+                con.close();
+            }catch (Exception e){
+                System.out.println("Error al cerrar la base de datos: " + e );
+            }
+        }
         return false;
     }
 
@@ -81,6 +105,27 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public boolean modificarCliente(Cliente cliente) {
+        PreparedStatement ps;
+        Connection con = getConnection();
+        String sql = "UPDATE cliente SET nombre=?,apellido=?,membresia=?" +
+                " WHERE id = ?";
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setString(1,cliente.getNombre());
+            ps.setString(2,cliente.getApellido());
+            ps.setInt(3,cliente.getMembresia());
+            ps.setInt(4,cliente.getId());
+            ps.execute();
+            return true;
+        }catch (Exception e){
+            System.out.println("Error al actualizar datos del cliente: " + e);
+        }finally {
+            try {
+                con.close();
+            }catch (Exception e){
+                System.out.println("Error al cerrar la base de datos: " + e);
+            }
+        }
         return false;
     }
 
@@ -90,10 +135,37 @@ public class ClienteDAO implements IClienteDAO {
     }
 
     public static void main(String[] args) {
+
+
+        // Buscar por id
+        // var cliente1 =  new Cliente(3);
+        //System.out.println("Cliente antes de la busqueda: " + cliente1);
+        //var encontrado = clienteDAO.buscarClientePorId(cliente1);
+        //if(encontrado)
+            // System.out.println("Cliente encontrado: " + cliente1);
+        //else
+          //  System.out.println("No se encontro cliente: " + cliente1.getId());
+
+        // Agregar cliente
+        IClienteDAO clienteDAO = new ClienteDAO();
+        //var nuevoCliente = new Cliente("Daniel","Ortiz",300);
+        //var agregado = clienteDAO.agregarCliente(nuevoCliente);
+        //if(agregado)
+          //  System.out.println("Cliente agregado: " + nuevoCliente);
+        //else
+            //System.out.println("No se agrego el cliente: " + nuevoCliente);
+
+        // Modificar cliente
+        var clienteActualizado = new Cliente(6,"Carlos Daniel","Ortiz",300);
+        var modificado = clienteDAO.modificarCliente(clienteActualizado);
+        if(modificado)
+            System.out.println("Cliente modificado: " + clienteActualizado);
+        else
+            System.out.println("No se modifico cliente: " + clienteActualizado);
+
         // Listar clientes
-        System.out.println("*** Listar Clientes ***");
-        var clienteDAO = new ClienteDAO();
+         System.out.println("*** Listar Clientes ***");
         var clientes = clienteDAO.listarClientes();
-        clientes.forEach(System.out::println);
+         clientes.forEach(System.out::println);
     }
 }
